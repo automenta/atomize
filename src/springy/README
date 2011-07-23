@@ -1,0 +1,7 @@
+This is a modified version of the standard Springy library.  
+
+I had to change some of the class names to avoid conflicting with x3dom's class names.
+
+Mainly these are classes with 'S' prepended to their name - that is the only difference.
+
+springyx3dom.js is a new file written for this project which implements an X3DOM renderer for Springy graphs.

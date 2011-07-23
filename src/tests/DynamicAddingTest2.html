@@ -1,0 +1,144 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns='http://www.w3.org/1999/xhtml'> 
+  <head> 
+	<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/> 
+		<title>Simple WebGL example</title> 
+		<style> 
+		p.case { clear: both; border-top: 1px solid #888; }
+		</style> 
+        <link rel="stylesheet" type="text/css" href="x3dom/x3dom.css" /> 
+	</head> 
+       
+<body> 
+ 
+    <h1>Add/Remove Nodes Example</h1> 
+	<p> 
+	simple example which shows how to add/remove nodes using a simple DOM appendChild()/removeChild() function
+	</p> 
+	<p class="case"> 
+		<x3d id="boxes" showLog='true' x="0px" y="0px" width="400px" height="300px"> 
+			<scene> 
+				<viewpoint position='4.88104 4.59865 7.4181' orientation='-0.69017 0.723467 -0.0161809 0.735134' ></viewpoint> 
+				<background DEF='bgnd' transparency='0' skyColor='1 1 1' ></background> 
+				<transform id="root" translation="0 0 0"> 
+					<shape> 
+						<box ></box> 
+					</shape> 
+				</transform> 
+			</scene> 
+		</x3d> 
+	</p> 
+	
+	<script type="text/javascript"> 
+	    
+    function addNode()
+    {
+		x = Math.random() * 6 - 3;
+		y = Math.random() * 6 - 3;
+		z = Math.random() * 6 - 3;
+	
+		s0 = Math.random() + 0.5;
+		s1 = Math.random() + 0.5;
+		s2 = Math.random() + 0.5;
+		
+        var t = document.createElement('Transform');
+        {
+            t.setAttribute("translation", x + " " + y + " " + z );
+            t.setAttribute("scale", s0 + " " + s1 + " " + s2 );
+            var s = document.createElement('Shape');
+            t.appendChild(s);
+            var b = document.createElement('Box');
+            s.appendChild(b);
+            
+        }
+                        
+        var ot = document.getElementById('root');
+        ot.appendChild(t);
+        
+        return t;
+    };
+    
+    function removeNode()
+    {
+        var ot = document.getElementById('root');
+        for (var i = 0; i < ot.childNodes.length; i++) {
+        	// check if we have a real X3DOM Node; not just e.g. a Text-tag
+        	if (ot.childNodes[i].nodeType === Node.ELEMENT_NODE) {
+        		ot.removeChild(ot.childNodes[i]);
+  				break;
+  			}
+  		}
+        
+        return false;
+    };
+
+    function addSphere(n, x, y ,z) {
+        var t = document.createElement('Transform');
+        {
+            t.setAttribute("translation", x + " " + y + " " + z );
+            t.setAttribute("scale", "1 1 1" );
+            var s = document.createElement('Shape');
+            t.appendChild(s);
+            var b = document.createElement('Sphere');
+            s.appendChild(b);            
+        }
+                        
+        n.appendChild(t);
+        
+        return t;
+        
+    }
+    function addText(n, text, x, y ,z) {
+        var t = document.createElement('Transform');
+        {
+            t.setAttribute("translation", x + " " + y + " " + z );
+            t.setAttribute("scale", "1 1 1" );
+            
+            var s = document.createElement('Shape');
+            t.appendChild(s);
+            
+            var txt = document.createElement('Text');
+            txt.setAttribute('string', 'Mono bolditalic 32px');
+            txt.setAttribute('solid', 'false');
+            {
+                var fs = document.createElement('fontstyle');
+                fs.setAttribute('family', "TYPEWRITER");
+                fs.setAttribute('style', "BOLDITALIC");
+                fs.setAttribute('size', "32");
+                txt.appendChild(fs);
+            }
+            s.appendChild(txt);            
+
+            /*    <shape>
+                    <appearance>
+                      <material ambientIntensity='0.0933' diffuseColor='0.32 0.54 0.26' shininess='0.51' specularColor='0.46 0.46 0.46'></material>
+                    </appearance>
+                    <text string='Mono bolditalic 32px' solid='false'>
+                        <fontstyle family="TYPEWRITER" style="BOLDITALIC" size="32"></fontstyle>
+                    </text>
+                  </shape>*/
+
+        }
+                        
+        n.appendChild(t);
+        
+        return t;
+        
+    }
+    
+    var n = addNode();
+    addText(n, "Text", 1, 1, 1);
+    
+</script> 
+	
+	<p class="case"> &nbsp; 
+	Dynamic childtree update
+	<input type="button" value="Add Child" 		onclick="window.addNode(); " /> 
+	<input type="button" value="Remove Child" 	onclick="window.removeNode();" /> 
+	</p> 
+	
+	<script type="text/javascript" src="x3dom/x3dom.js"></script> 
+ 
+</body> 
+</html> 
