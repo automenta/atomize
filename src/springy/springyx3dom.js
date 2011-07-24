@@ -345,6 +345,11 @@ jQuery.fn.springyx3dom = function(params) {
                         var ot = document.getElementById('root');
                         ot.appendChild(t);                        
                         
+                        if (edge.data.label != undefined) {
+                            //add text
+                            var textNode = addText(t, edge.data.label, 0, 0, 2);
+                        }
+                        
                         edgeToShape[edgeLabel] = true;                        
                     }
                     

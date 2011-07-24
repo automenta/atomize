@@ -140,7 +140,7 @@
                     subjectNode = graph.newNode({label: subject});
                     nodes[subject] = subjectNode;
                 }
-                var objectNode;
+                var objectNode = nodes[object];
                 if (objectNode == undefined) {
                     objectNode = graph.newNode({label: object});
                     nodes[object] = objectNode;
