@@ -1,0 +1,75 @@
+<!--
+
+See:
+    http://code.google.com/p/rdfquery/wiki/RdfPlugin
+    http://answers.semanticweb.com/questions/573/how-to-create-rdfa-powered-n3-in-the-html-output
+    http://www.w3.org/TR/xhtml-rdfa-primer/
+    http://dl.dropbox.com/u/4849096/2010/02/rdfquery-demo/demo-auto-rdfa.html
+
+http://www.jenitennison.com/blog/node/123
+
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+        <script src="../rdfquery/jquery.rdfquery.core.min-1.0.js"></script>
+        
+
+        <script>
+
+        var r, databank;
+        var loaded;
+            
+        jQuery(document).ready(function(){
+            //Manually Creating RDF
+//            var r = $.rdf.databank([
+//                '<photo1.jpg> dc:creator <http://www.blogger.com/profile/1109404> .',
+//                '<http://www.blogger.com/profile/1109404> foaf:img <photo1.jpg> .'
+//              ], 
+//              { base: 'http://www.example.org/',
+//                namespaces: { 
+//                  dc: 'http://purl.org/dc/elements/1.1/', 
+//                  foaf: 'http://xmlns.com/foaf/0.1/' } });
+//      
+            r = $.rdf.databank( { base: 'http://www.example.org/',
+                namespaces: { 
+                  dc: 'http://purl.org/dc/elements/1.1/', 
+                  foaf: 'http://xmlns.com/foaf/0.1/' } });
+            
+            //Loading RDF from file
+            //var url = 'file:///work/atomize/src/tests/foaf.rdf';
+            
+            // REMOTE doesnt work yet
+            var url = 'http://xmlns.com/foaf/spec/index.rdf';
+            //var url = 'http://rdf.freebase.com/rdf/film';
+            $.get(url, function(data) {
+                loaded = $.rdf().load(data);
+
+                //$('rdfdisplay').html(databank.dump());
+                //alert($.toJSON(databank.dump()));
+                //alert(databank.dump('application/rdf+xml'));
+                //alert(databank);
+                //var serialized = $.rdf().databank.dump({format:'application/rdf+xml', serialize: true});
+                //alert(serialized);
+                //document.getElementById('rdfdisplay').innerHTML = '<pre>' + serialized + '</pre>';
+                //$('.rdfdisplay').html(data);
+                alert(data);
+                
+                
+            });
+            
+        });
+        
+        </script>
+
+    </head>
+    <body>
+        <div>Test RDF Reading</div>
+        <br/>
+        <pre id="rdfdisplay"></pre>
+    </body>
+</html>

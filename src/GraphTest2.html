@@ -7,6 +7,8 @@
     <link rel='stylesheet' type='text/css' href='x3dom/examples.css'>
     <!-- <link rel='stylesheet' type='text/css' href='x3dom/orbitron.css'> -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script src="rdfquery/jquery.rdfquery.core.min-1.0.js"></script>
+    
     <style>
     
         html{width:100%;height:100%;margin:0;padding:0;}
@@ -103,27 +105,52 @@
 
         var graph = new SGraph();
 
-        var dennis = graph.newNode({label: 'Dennis'});
-        var michael = graph.newNode({label: 'Michael'});
-        var jessica = graph.newNode({label: 'Jessica'});
-        var timothy = graph.newNode({label: 'Timothy'});
-        var barbara = graph.newNode({label: 'Barbara'});
-        var franklin = graph.newNode({label: 'Franklin'});
-        var monty = graph.newNode({label: 'Monty'});
-        var james = graph.newNode({label: 'James'});
-        var bianca = graph.newNode({label: 'Bianca'});
+        var data;
+        jQuery(document).ready(function(){
+            //Manually Creating RDF
+            data = $.rdf.databank()
+              .prefix('foaf', 'http://xmlns.com/foaf/0.1/')
+              .prefix('dc', 'http://purl.org/dc/elements/1.1/')
+              .prefix('dct', 'http://purl.org/dc/terms/')
+              .prefix('xsd', 'http://www.w3.org/2001/XMLSchema#')
+              .add('<http://example.com/aReallyGreatBook> dc:title "A Really Great Book" .')
+              .add('<http://example.com/aReallyGreatBook> dc:creator _:creator .')
+              .add('_:creator a foaf:Person .')
+              .add('_:creator foaf:name "John Doe" .')
+              .add('<http://example.com/aReallyGreatBook> dct:issued "2004-01-19"^^xsd:date .')
 
-        graph.newEdge(dennis, michael, {color: '#00A0B0'});
-        graph.newEdge(michael, dennis, {color: '#6A4A3C'});
-        graph.newEdge(michael, jessica, {color: '#CC333F'});
-        graph.newEdge(jessica, barbara, {color: '#EB6841'});
-        graph.newEdge(michael, timothy, {color: '#EDC951'});
-        graph.newEdge(franklin, monty, {color: '#7DBE3C'});
-        graph.newEdge(dennis, monty, {color: '#000000'});
-        graph.newEdge(monty, james, {color: '#00A0B0'});
-        graph.newEdge(barbara, timothy, {color: '#6A4A3C'});
-        graph.newEdge(dennis, bianca, {color: '#CC333F'});
-        graph.newEdge(bianca, monty, {color: '#EB6841'});
+//            data.where('?s ?p ?o').each(function() {
+//                
+//                alert(this);
+//                alert(this.s.value + ' ' + this.p.value + ' ' + this.o.value);
+//            });
+            var nodes = new Array();
+            
+            var tr = data.triples();
+            for (i=0; i < tr.length; i++) {
+                
+                var property = tr[i].property.value;
+                var subject = tr[i].subject.value;
+                var object = tr[i].object.value;
+                
+                //alert(subject + ' ' + property + ' ' + object);
+                
+                var subjectNode = nodes[subject];
+                if (subjectNode == undefined) {
+                    subjectNode = graph.newNode({label: subject});
+                    nodes[subject] = subjectNode;
+                }
+                var objectNode;
+                if (objectNode == undefined) {
+                    objectNode = graph.newNode({label: object});
+                    nodes[object] = objectNode;
+                }
+                
+                graph.newEdge(subjectNode, objectNode, {label:property, color: '#00A0B0'});
+           }
+            
+        });
+
 
         jQuery(document).ready(function(){
                 layout = jQuery('#root').springyx3dom({ 'graph': graph });

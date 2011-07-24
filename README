@@ -1,0 +1,11 @@
+Interactive Graph Visualization JS/HTML Widget
+
+Dependencies (included):
+
+    jquery (for DOM manipulation & UI components)
+
+    x3dom
+
+    springy (modified for compatiblity with x3dom)
+
+    rdfquery (for RDF I/O)
