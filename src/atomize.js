@@ -1,3 +1,91 @@
+function new3DSpace(element, width, height) {
+    var e = $(element);
+    var t = '';
+    
+    var x3delement = element + '_X3D';
+    
+    t += '<x3d id="' + x3delement + '" style="position:relative; display:block; line-height:0px; padding:0; display:block; width:' + width + '; height:' + height + '; border-color:#666;">';
+    t += '<scene>';
+    t += '  <param name="PrimitiveQuality" value="Low"></param>';
+    t += '  <viewpoint position="0 0 11"></viewpoint>';
+    t += '  <background skyColor="0.5 0.5 0.5"></background>';
+    t += '  <transform id="' + element + '_root" translation="0 0 0"></transform>';
+    t += '</scene>';
+
+    //TODO only create a full-screen button if indicated by a parameter to this function
+    
+    t += '<ul class="spacetools">';
+    t += '  <li><button onclick="toggle_size(document.getElementById(\'';
+        t+= x3delement;
+        t+= '\'), this);"><img src="images/fullscreen.png"/></button></li>';
+    t += '</ul>';
+    
+    t += '</x3d>';
+    
+    e.html(t);
+    return e;
+}
+
+
+var x3dZoomed = Array();
+
+function toggle_size(x3d_element, button) {            
+
+    if (x3dZoomed[x3d_element] == undefined) {
+        x3dZoomed[x3d_element] = false;
+    }
+
+    if (x3dZoomed[x3d_element]) {
+            button.style.backgroundColor = "#202021";
+            x3d_element.style.borderWidth  = "1px"
+            new_width = "50%";
+            x3dZoomed[x3d_element] = false;
+    } else {
+            button.style.backgroundColor = "#c23621";
+            x3d_element.style.borderWidth  = "0px"
+            new_width = "100%";
+            x3dZoomed[x3d_element] = true;
+    }
+
+    x3d_element.style.width  = new_width
+    x3d_element.style.height = new_width
+    return true;
+}
+
+
+AGraph.prototype.loadDataBank = function(rdfDataBank) {
+    var nodes = new Array();
+
+    var tr = rdfDataBank.triples();
+    for (i=0; i < tr.length; i++) {
+
+        var property = tr[i].property.value;
+        var subject = tr[i].subject.value;
+        var object = tr[i].object.value;
+
+        //alert(subject + ' ' + property + ' ' + object);
+
+        var subjectNode = nodes[subject];
+        if (subjectNode == undefined) {
+            subjectNode = this.newNode({label: subject});
+            nodes[subject] = subjectNode;
+        }
+        var objectNode = nodes[object];
+        if (objectNode == undefined) {
+            objectNode = this.newNode({label: object});
+            nodes[object] = objectNode;
+        }
+
+        this.newEdge(subjectNode, objectNode, {label:property, color: '#00A0B0'});
+   }
+   
+   return this;
+}
+
+function graphLayout(space, graph) {
+   return $(space).springyx3dom({ 'graph': graph });
+}
+
 /**
 Copyright (c) 2010 Dennis Hotson
 
@@ -26,7 +114,6 @@ function addText(n, text, x, y ,z) {
     var t = document.createElement('Transform');
     {
         t.setAttribute("translation", x + " " + y + " " + z );
-        t.setAttribute("scale", "1 1 1" );
 
         var s = document.createElement('Shape');
         t.appendChild(s);
@@ -78,11 +165,20 @@ function nodeClicked(nodeId) {
     //alert('node clicked: ' + nodeId);
 }
 
+
+var HALFPI = 3.14159 / 2.0;
+
 (function() {
 
 jQuery.fn.springyx3dom = function(params) {
     var graph = params.graph;
-    if(!graph){
+    
+    var element = this;
+    //var element = params.element;
+    //var elementName = element.attr('id');
+    var elementName = '#' + element.attr('id');
+    
+    if ((!graph) || (!element)) {
         return null;
     }
     
@@ -90,8 +186,6 @@ jQuery.fn.springyx3dom = function(params) {
     var repulsion = params.repulsion || 400.0;
     var damping = params.damping || 0.5;
 
-    var rootTransform = this[0];
-    
     var layout = new SLayout.ForceDirected(graph, stiffness, repulsion, damping);
 
     var radius = 4;
@@ -211,7 +305,10 @@ jQuery.fn.springyx3dom = function(params) {
                     //alert('drawing edge: ' + edge + ' ' + edge.source.data.label + ' ' + edge.target.data.label);
                     
                     var updateNode = function(node, x, y) {     
+                        var nid = node.id;
                         var label = node.data.label;
+                        var tid = elementName + '.' + nid + '.nodeTransform';
+                        
                         if (vertexToShape[label] == undefined) {
                             //alert('adding node: ' + label + " " + vertexToShape.length);
                             vertexToShape[label] = true;
@@ -222,7 +319,7 @@ jQuery.fn.springyx3dom = function(params) {
                             s2 = 0.2; //Math.random() + 0.5;
 
                             var t = document.createElement('Transform');
-                            t.id = 'transform.' + label;
+                            t.id = tid;
                             t.setAttribute("scale", s0 + " " + s1 + " " + s2 );
                             
                             var s = document.createElement('Shape');
@@ -231,7 +328,7 @@ jQuery.fn.springyx3dom = function(params) {
                             var b = document.createElement('Box');
                             s.appendChild(b);
                             
-                            var ot = document.getElementById('root');
+                            var ot = document.getElementById(elementName + '_root');
                             ot.appendChild(t);
                             
                             var textNode = addText(t, label, 0, 0, 2);
@@ -244,7 +341,7 @@ jQuery.fn.springyx3dom = function(params) {
 
                         }
                         
-                        var tt = document.getElementById('transform.' + label);
+                        var tt = document.getElementById(tid);
                         tt.setAttribute("translation", x + " " + y + " 0");
                         
                     };
@@ -311,6 +408,8 @@ jQuery.fn.springyx3dom = function(params) {
 //                            lineEnd = s2;
                     }
 
+                    var eid = elementName + '.' + edge.id + '.edgeTransform';
+                    
                     var edgeLabel = edge.source.id + '..' + edge.target.id;
                     var lineLength = Math.sqrt(s2.subtract(s1).magnitude());
                     var sx = 1.0; //width
@@ -334,7 +433,7 @@ jQuery.fn.springyx3dom = function(params) {
                          */
                             
                         var t = document.createElement('Transform');
-                        t.id = 'transform.' + edgeLabel;
+                        t.id = eid;
 
                         var s = document.createElement('Shape');
                         t.appendChild(s);
@@ -342,21 +441,24 @@ jQuery.fn.springyx3dom = function(params) {
                         var b = document.createElement('Cone');
                         s.appendChild(b);
 
-                        var ot = document.getElementById('root');
+                        var ot = document.getElementById(elementName + '_root');
                         ot.appendChild(t);                        
                         
                         if (edge.data.label != undefined) {
                             //add text
                             var textNode = addText(t, edge.data.label, 0, 0, 2);
+                            textNode.setAttribute('rotation', "0 0 1 " + HALFPI);
+                            textNode.setAttribute('scale', (1.0 / sy) + " 1 1");
                         }
                         
                         edgeToShape[edgeLabel] = true;                        
                     }
                     
                     
-                    var theta = Math.atan2((s2.y - s1.y), (s2.x - s1.x)) + 3.14159/2.0;
+                    var theta = Math.atan2((s2.y - s1.y), (s2.x - s1.x)) + HALFPI;
+                    theta += HALFPI *2.0;
                     
-                    var lt = document.getElementById('transform.' + edgeLabel);
+                    var lt = document.getElementById(eid);
                     lt.setAttribute("scale", sx + " " + sy + " " + sz );
                     lt.setAttribute("translation", x + " " + y + " 0");
                     lt.setAttribute("rotation", "0 0 1 " + theta);

@@ -23,7 +23,7 @@ Copyright (c) 2010 Dennis Hotson
  OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var SGraph = function()
+var AGraph = function()
 {
 	this.nodeSet = {};
 	this.nodes = [];
@@ -49,7 +49,7 @@ SEdge = function(id, source, target, data)
 	this.data = typeof(data) !== 'undefined' ? data : {};
 };
 
-SGraph.prototype.addNode = function(node)
+AGraph.prototype.addNode = function(node)
 {
 	if (typeof(this.nodeSet[node.id]) === 'undefined')
 	{
@@ -62,7 +62,7 @@ SGraph.prototype.addNode = function(node)
 	return node;
 };
 
-SGraph.prototype.addEdge = function(edge)
+AGraph.prototype.addEdge = function(edge)
 {
 	var exists = false;
 	this.edges.forEach(function(e){
@@ -97,14 +97,14 @@ SGraph.prototype.addEdge = function(edge)
 	return edge;
 };
 
-SGraph.prototype.newNode = function(data)
+AGraph.prototype.newNode = function(data)
 {
 	var node = new SNode(this.nextNodeId++, data);
 	this.addNode(node);
 	return node;
 };
 
-SGraph.prototype.newEdge = function(source, target, data)
+AGraph.prototype.newEdge = function(source, target, data)
 {
 	var edge = new SEdge(this.nextEdgeId++, source, target, data);
 	this.addEdge(edge);
@@ -112,7 +112,7 @@ SGraph.prototype.newEdge = function(source, target, data)
 };
 
 // find the edges from node1 to node2
-SGraph.prototype.getEdges = function(node1, node2)
+AGraph.prototype.getEdges = function(node1, node2)
 {
 	if (typeof(this.adjacency[node1.id]) !== 'undefined'
 		&& typeof(this.adjacency[node1.id][node2.id]) !== 'undefined')
@@ -124,7 +124,7 @@ SGraph.prototype.getEdges = function(node1, node2)
 };
 
 // remove a node and it's associated edges from the graph
-SGraph.prototype.removeNode = function(node)
+AGraph.prototype.removeNode = function(node)
 {
 	if (typeof(this.nodeSet[node.id]) !== 'undefined')
 	{
@@ -152,7 +152,7 @@ SGraph.prototype.removeNode = function(node)
 
 
 // remove a node and it's associated edges from the graph
-SGraph.prototype.removeEdge = function(edge)
+AGraph.prototype.removeEdge = function(edge)
 {
 	for (var i = this.edges.length - 1; i >= 0; i--)
 	{
@@ -181,7 +181,7 @@ SGraph.prototype.removeEdge = function(edge)
 	this.notify();
 };
 
-/* Merge a list of nodes and edges into the current SGraph. eg.
+/* Merge a list of nodes and edges into the current AGraph. eg.
 var o = {
 	nodes: [
 		{id: 123, data: {type: 'user', userid: 123, displayname: 'aaa'}},
@@ -192,7 +192,7 @@ var o = {
 	]
 }
 */
-SGraph.prototype.merge = function(data)
+AGraph.prototype.merge = function(data)
 {
 	var nodes = [];
 	data.nodes.forEach(function(n) {
@@ -214,7 +214,7 @@ SGraph.prototype.merge = function(data)
 	}, this);
 };
 
-SGraph.prototype.filterNodes = function(fn)
+AGraph.prototype.filterNodes = function(fn)
 {
 	var tmpNodes = this.nodes.slice();
 	tmpNodes.forEach(function(n) {
@@ -225,7 +225,7 @@ SGraph.prototype.filterNodes = function(fn)
 	}, this);
 };
 
-SGraph.prototype.filterEdges = function(fn)
+AGraph.prototype.filterEdges = function(fn)
 {
 	var tmpEdges = this.edges.slice();
 	tmpEdges.forEach(function(e) {
@@ -237,12 +237,12 @@ SGraph.prototype.filterEdges = function(fn)
 };
 
 
-SGraph.prototype.addGraphListener = function(obj)
+AGraph.prototype.addGraphListener = function(obj)
 {
 	this.eventListeners.push(obj);
 };
 
-SGraph.prototype.notify = function()
+AGraph.prototype.notify = function()
 {
 	this.eventListeners.forEach(function(obj){
 		obj.graphChanged();
