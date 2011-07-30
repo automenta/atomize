@@ -166,6 +166,29 @@ function nodeClicked(nodeId) {
 }
 
 
+function parseFromString(xml){
+  var doc;
+  try {
+    doc = new ActiveXObject("Microsoft.XMLDOM");
+    doc.async = "false";
+    doc.loadXML(xml);
+  } catch(e) {
+    var parser = new DOMParser();
+    doc = parser.parseFromString(xml, 'text/xml');
+  }
+  return doc;
+};
+
+function loadRDFXML(e) {
+    var doc = parseFromString($(e).html());
+    var databank = $.rdf.databank();
+    databank.load(doc);
+    return databank;            
+}
+
+
+
+
 var HALFPI = 3.14159 / 2.0;
 
 (function() {
@@ -183,7 +206,7 @@ jQuery.fn.springyx3dom = function(params) {
     }
     
     var stiffness = params.stiffness || 400.0;
-    var repulsion = params.repulsion || 400.0;
+    var repulsion = params.repulsion || 1600.0;
     var damping = params.damping || 0.5;
 
     var layout = new SLayout.ForceDirected(graph, stiffness, repulsion, damping);

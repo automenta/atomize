@@ -1,0 +1,64 @@
+<html>
+<head>
+    
+    <meta charset="utf-8">
+    <title>X3DOM text example</title>
+    
+    <link href='x3dom/x3dom.css' rel='stylesheet' type='text/css'>
+        
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script src="rdfquery/jquery.rdfquery.core.min-1.0.js"></script>
+
+    <script src="x3dom/x3dom.js"></script>   
+    <script src="springy/springy.js"></script>
+    
+    <link href="atomize.css" rel='stylesheet' type='text/css' >
+    <script src="atomize.js"></script>
+
+</head>
+
+
+<body id="main" style="color:white; background-color: black; margin:0; padding:0px;">
+
+    <div id="content"></div>
+    
+    <script>
+
+        $(function(){
+
+              var rdfdata = loadRDFXML('#rdfxml');
+
+              var graph = new AGraph().loadDataBank(rdfdata);
+              var space = new3DSpace('#content', '100%', '100%');
+              var layout = graphLayout('#content', graph);            
+
+        });
+
+    </script>
+    
+    <p id="rdfxml">
+        <rdf:RDF xml:base="http://atomize.it.all/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:vCard="http://www.w3.org/2006/vcard/ns#">
+            <rdf:Description rdf:about="http://qqqfoo.com/staff/corky">
+                <vCard:ADR rdf:parseType="Resource">
+                   <vCard:Street>111 Lake Drive </vCard:Street>
+                   <vCard:Locality>WonderCity </vCard:Locality>
+                   <vCard:Pcode>5555</vCard:Pcode>
+                   <vCard:Country>Australia</vCard:Country>
+                </vCard:ADR>
+            </rdf:Description>
+        </rdf:RDF>
+    </p>
+    
+    <!--
+    <p id="rdfa">
+        This paper was written by <span rel="dc:creator" resource="#me"><span property="foaf:name">Ben Adida</span>.</span>
+    </p>
+
+
+    <pre id="n3">
+        <http://example.com/aReallyGreatBook> dc:title "A Really Great Book" .
+        <http://example.com/aReallyGreatBook> dc:creator _:creator .
+    </pre>
+    -->
+</body>
+</html>

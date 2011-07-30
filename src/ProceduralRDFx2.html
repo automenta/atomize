@@ -11,6 +11,7 @@
 
     <script src="x3dom/x3dom.js"></script>   
     <script src="springy/springy.js"></script>
+    <script src="springy/springyui.js"></script>
     
     <link href="atomize.css" rel='stylesheet' type='text/css' >
     <script src="atomize.js"></script>
@@ -18,9 +19,10 @@
 </head>
 
 
-<body id="main" style="color:white; background-color: black; margin:0; padding:0px;">
+<body id="main" style="color:white; background-color: black; margin:0; padding:0px; width:100%;height:95%;">
 
     <div id="content"></div>
+    <div id="content2"></div>
     
     <script>
 
@@ -41,6 +43,11 @@
             var graph = new AGraph().loadDataBank(rdfdata);
             var space = new3DSpace('#content', '50%', '50%');
             var layout = graphLayout('#content', graph);            
+
+            var graph2 = new AGraph().loadDataBank(rdfdata);
+            var space2 = new3DSpace('#content2', '50%', '50%');
+            var layout2 = graphLayout('#content2', graph2);
+
         });
 
     </script>
