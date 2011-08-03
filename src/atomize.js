@@ -188,7 +188,6 @@ function loadRDFXML(e) {
 
 
 
-
 var HALFPI = 3.14159 / 2.0;
 
 (function() {
