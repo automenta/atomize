@@ -152,6 +152,12 @@ function addText(n, text, x, y ,z) {
                 </text>
               </shape>*/
 
+        var textlength = text.length * 1.0;
+        if (textlength > 0) {
+            var sx = 4.0/textlength;
+            var sy = 4.0/textlength;
+            t.setAttribute("scale", sx + " " + sy + " 1.0" );
+        }
     }
 
     n.appendChild(t);
@@ -422,13 +428,6 @@ jQuery.fn.springyx3dom = function(params) {
                     var directional = typeof(edge.data.directional) !== 'undefined' ? edge.data.directional : true;
 //
 //                    // line
-                    var lineEnd;
-                    if (directional) {
-//                            lineEnd = intersection.subtract(direction.normalise().multiply(arrowLength * 0.5));
-                    }
-                    else {
-//                            lineEnd = s2;
-                    }
 
                     var eid = elementName + '.' + edge.id + '.edgeTransform';
                     
@@ -468,9 +467,15 @@ jQuery.fn.springyx3dom = function(params) {
                         
                         if (edge.data.label != undefined) {
                             //add text
+                            var ll = edge.data.label.length * 1.0;
                             var textNode = addText(t, edge.data.label, 0, 0, 2);
                             textNode.setAttribute('rotation', "0 0 1 " + HALFPI);
-                            textNode.setAttribute('scale', (1.0 / sy) + " 1 1");
+
+                            //var nsx = (1.0 / (sy*ll/18.0));
+                            //var nsy = (1.0 / (ll/18.0));
+                            var nsx = 0.5 / sy;
+                            var nsy = 0.5;
+                            textNode.setAttribute('scale', nsx + " " + nsy + " 1");
                         }
                         
                         edgeToShape[edgeLabel] = true;                        
@@ -481,75 +486,15 @@ jQuery.fn.springyx3dom = function(params) {
                     theta += HALFPI *2.0;
                     
                     var lt = document.getElementById(eid);
-                    lt.setAttribute("scale", sx + " " + sy + " " + sz );
-                    lt.setAttribute("translation", x + " " + y + " 0");
-                    lt.setAttribute("rotation", "0 0 1 " + theta);
-                    //update edgeToShape
-
-//
-//                    ctx.strokeStyle = stroke;
-//                    ctx.beginPath();
-//                    ctx.moveTo(s1.x, s1.y);
-//                    ctx.lineTo(lineEnd.x, lineEnd.y);
-//                    ctx.stroke();
-//
-//                    // arrow
-//
-//                    if (directional)
-//                    {
-//                            ctx.save();
-//                            ctx.fillStyle = stroke;
-//                            ctx.translate(intersection.x, intersection.y);
-//                            ctx.rotate(Math.atan2(y2 - y1, x2 - x1));
-//                            ctx.beginPath();
-//                            ctx.moveTo(-arrowLength, arrowWidth);
-//                            ctx.lineTo(0, 0);
-//                            ctx.lineTo(-arrowLength, -arrowWidth);
-//                            ctx.lineTo(-arrowLength * 0.8, -0);
-//                            ctx.closePath();
-//                            ctx.fill();
-//                            ctx.restore();
-//                    }
+                    if (lt != undefined) {
+                        lt.setAttribute("scale", sx + " " + sy + " " + sz );
+                        lt.setAttribute("translation", x + " " + y + " 0");
+                        lt.setAttribute("rotation", "0 0 1 " + theta);
+                    }
             },
             function drawNode(node, p)
             {
-                    var s = toScreen(p);
 
-//                    ctx.save();
-
-                    var boxWidth = 100;
-                    var boxHeight = 100;
-                    //var boxWidth = node.getWidth();
-                    //var boxHeight = node.getHeight();
-
-                    // fill background
-//                    ctx.clearRect(s.x - boxWidth/2, s.y - 10, boxWidth, 20);
-//
-//                    // fill background
-//                    if (selected !== null && nearest.node !== null && selected.node.id === node.id)
-//                    {
-//                            ctx.fillStyle = "#FFFFE0";
-//                    }
-//                    else if (nearest !== null && nearest.node !== null && nearest.node.id === node.id)
-//                    {
-//                            ctx.fillStyle = "#EEEEEE";
-//                    }
-//                    else
-//                    {
-//                            ctx.fillStyle = "#FFFFFF";
-//                    }
-//
-//                    ctx.fillRect(s.x - boxWidth/2, s.y - 10, boxWidth, 20);
-//
-//                    ctx.textAlign = "left";
-//                    ctx.textBaseline = "top";
-//                    ctx.font = "16px Verdana, sans-serif";
-//                    ctx.fillStyle = "#000000";
-//                    ctx.font = "16px Verdana, sans-serif";
-//                    var text = typeof(node.data.label) !== 'undefined' ? node.data.label : node.id;
-//                    ctx.fillText(text, s.x - boxWidth/2 + 5, s.y - 8);
-//
-//                    ctx.restore();
             }
     );
 

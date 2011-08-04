@@ -9,3 +9,17 @@ Dependencies (included):
     springy (modified for compatiblity with x3dom)
 
     rdfquery (for RDF I/O)
+
+
+Features
+--------
+Javascript interactive display of 3D visualization of graph or tree data
+
+Graph data from:
+  --RDF (RDF/XML and N3)
+  --Javascript code
+
+
+Next Version
+------------
+Visualization Functions
