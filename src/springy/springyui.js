@@ -25,7 +25,7 @@ Copyright (c) 2010 Dennis Hotson
 
 (function() {
 
-jQuery.fn.springy = function(params) {
+jQuery.fn.springy = function( params) {
     var graph = params.graph;
     if(!graph){
         return;
@@ -55,19 +55,28 @@ jQuery.fn.springy = function(params) {
 		};
 	}, 50);
 
+
+    //temporary vector
+    var tp = new Vector(0,0);
+    var windowOffset = new Vector(0,0);
+    
 	// convert to/from screen coordinates
-	toScreen = function(p) {
+	var toScreen = function(x, y) {
+        tp.x = x * mag + windowOffset.x;
+        tp.y = y * mag + windowOffset.y;
+        
 		var size = currentBB.topright.subtract(currentBB.bottomleft);
-		var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * canvas.width;
-		var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * canvas.height;
-		return new Vector(sx, sy);
+		var sx = tp.subtract(currentBB.bottomleft).divide(size.x).x * canvas.width;
+		var sy = tp.subtract(currentBB.bottomleft).divide(size.y).y * canvas.height;
+
+        return new Vector(sx, sy);
 	};
 
-	fromScreen = function(s) {
+	var fromScreen = function(s) {
 		var size = currentBB.topright.subtract(currentBB.bottomleft);
 		var px = (s.x / canvas.width) * size.x + currentBB.bottomleft.x;
 		var py = (s.y / canvas.height) * size.y + currentBB.bottomleft.y;
-		return new Vector(px, py);
+		return new Vector((px-windowOffset.x)/mag, (py-windowOffset.y)/mag);
 	};
 
 	// half-assed drag and drop
@@ -75,6 +84,21 @@ jQuery.fn.springy = function(params) {
 	var nearest = null;
 	var dragged = null;
 
+    var mag = 1.0;
+    
+    var panning = false;
+    var nearThreshold = 0.2;
+    var lastPoint = null;
+    
+    jQuery(canvas).bind('mousewheel', function(e){
+        if(e.wheelDelta/120 > 0) {
+            mag += 0.1;
+        }
+        else{
+            mag -= 0.1;
+        }
+    });
+        
 	jQuery(canvas).mousedown(function(e){
 		jQuery('.actions').hide();
 
@@ -82,7 +106,12 @@ jQuery.fn.springy = function(params) {
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = nearest = dragged = layout.nearest(p);
 
-		if (selected.node !== null)
+        if (dragged.distance > nearThreshold) {
+            dragged = null;
+            panning = true;    
+        }
+        
+		if ((selected.node !== null) && (dragged!=null))
 		{
 			dragged.point.m = 10000.0;
 		}
@@ -100,12 +129,21 @@ jQuery.fn.springy = function(params) {
 			dragged.point.p.x = p.x;
 			dragged.point.p.y = p.y;
 		}
-
+        if (panning) {
+            if (lastPoint!=null) {
+                windowOffset.x -= (lastPoint.x - p.x);
+                windowOffset.y -= (lastPoint.y - p.y);
+            }
+            lastPoint = p;  
+        }
+        
 		renderer.start();
 	});
 
 	jQuery(window).bind('mouseup',function(e){
 		dragged = null;
+        panning = false;
+        lastPoint = null;
 	});
 
 	Node.prototype.getWidth = function() {
@@ -128,10 +166,10 @@ jQuery.fn.springy = function(params) {
 		},
 		function drawEdge(edge, p1, p2)
 		{
-			var x1 = toScreen(p1).x;
-			var y1 = toScreen(p1).y;
-			var x2 = toScreen(p2).x;
-			var y2 = toScreen(p2).y;
+			var x1 = toScreen(p1.x, p1.y).x;
+			var x2 = toScreen(p2.x, p2.y).x;
+			var y1 = toScreen(p1.x, p1.y).y;
+			var y2 = toScreen(p2.x, p2.y).y;
 
 			var direction = new Vector(x2-x1, y2-y1);
 			var normal = direction.normal().normalise();
@@ -155,8 +193,8 @@ jQuery.fn.springy = function(params) {
 			// Figure out how far off centre the line should be drawn
 			var offset = normal.multiply(-((total - 1) * spacing)/2.0 + (n * spacing));
 
-			var s1 = toScreen(p1).add(offset);
-			var s2 = toScreen(p2).add(offset);
+			var s1 = toScreen(p1.x, p1.y).add(offset);
+			var s2 = toScreen(p2.x, p2.y).add(offset);
 
 			//var boxWidth = edge.target.getWidth();
 			//var boxHeight = edge.target.getHeight();
@@ -217,10 +255,21 @@ jQuery.fn.springy = function(params) {
 				ctx.fill();
 				ctx.restore();
 			}
-		},
+            
+            var cx = (s1.x + lineEnd.x)/2.0;
+            var cy = (s1.y + lineEnd.y)/2.0;
+            
+			ctx.textBaseline = "top";
+			ctx.font = "12px Verdana, sans-serif";
+			ctx.fillStyle = "#000000";
+            ctx.textAlign = "center";
+			var text = typeof(edge.data.label) !== 'undefined' ? edge.data.label : edge.id;
+			ctx.fillText(text, cx, cy);
+
+        },
 		function drawNode(node, p)
 		{
-			var s = toScreen(p);
+			var s = toScreen(p.x, p.y);
 
 			ctx.save();
 
@@ -248,13 +297,13 @@ jQuery.fn.springy = function(params) {
 
 			ctx.fillRect(s.x - boxWidth/2, s.y - 10, boxWidth, 20);
 
-			ctx.textAlign = "left";
+			ctx.textAlign = "center";
 			ctx.textBaseline = "top";
 			ctx.font = "16px Verdana, sans-serif";
 			ctx.fillStyle = "#000000";
 			ctx.font = "16px Verdana, sans-serif";
 			var text = typeof(node.data.label) !== 'undefined' ? node.data.label : node.id;
-			ctx.fillText(text, s.x - boxWidth/2 + 5, s.y - 8);
+			ctx.fillText(text, s.x /*- boxWidth/2 + 5*/, s.y - 8);
 
 			ctx.restore();
 		}

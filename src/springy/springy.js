@@ -251,6 +251,7 @@ AGraph.prototype.notify = function()
 
 // -----------
 var SLayout = {};
+
 SLayout.ForceDirected = function(graph, stiffness, repulsion, damping)
 {
 	this.graph = graph;

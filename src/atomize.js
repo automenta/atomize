@@ -1,9 +1,11 @@
-function new3DSpace(element, width, height) {
+function new3DSpace(element, graph, width, height) {
+    element = '#' + element;
+    
     var e = $(element);
-    var t = '';
     
     var x3delement = element + '_X3D';
     
+    var t = '';    
     t += '<x3d id="' + x3delement + '" style="position:relative; display:block; line-height:0px; padding:0; display:block; width:' + width + '; height:' + height + '; border-color:#666;">';
     t += '<scene>';
     t += '  <param name="PrimitiveQuality" value="Low"></param>';
@@ -23,8 +25,25 @@ function new3DSpace(element, width, height) {
     t += '</x3d>';
     
     e.html(t);
+
+    var layout = graphLayout(element, graph);
+
     return e;
 }
+
+function new2DSpace(element, graph, width, height) {
+    var e = $('#' + element);
+    var canvasElement = element + '_canvas';
+    
+    var t = '';
+    t += '<canvas id="' + canvasElement + '" width="' + width + '" height="' + height + '"></canvas>'; 
+    e.html(t);
+
+    jQuery('#' + canvasElement).springy({ 'graph': nameGraph });  
+
+    return e;
+}
+
 
 
 var x3dZoomed = Array();
@@ -202,8 +221,6 @@ jQuery.fn.springyx3dom = function(params) {
     var graph = params.graph;
     
     var element = this;
-    //var element = params.element;
-    //var elementName = element.attr('id');
     var elementName = '#' + element.attr('id');
     
     if ((!graph) || (!element)) {
@@ -237,11 +254,16 @@ jQuery.fn.springyx3dom = function(params) {
             };
     }, 50);
 
+    var tp = new Vector();
+    
     // convert to/from screen coordinates
-    toScreen = function(p) {
+    toScreen = function(x, y) {
+            tp.x = x;
+            tp.y = y;
+            
             var size = currentBB.topright.subtract(currentBB.bottomleft);
-            var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * 100; //canvas.width;
-            var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * 100; //canvas.height;
+            var sx = tp.subtract(currentBB.bottomleft).divide(size.x).x * 100; //canvas.width;
+            var sy = tp.subtract(currentBB.bottomleft).divide(size.y).y * 100; //canvas.height;
             
             sx = sx * 0.2 - (radius*2);
             sy = sy * 0.2 - (radius*2);
@@ -319,10 +341,10 @@ jQuery.fn.springyx3dom = function(params) {
             {
                 //alert('adding edge: ', edge);
                 
-                    var x1 = toScreen(p1).x;
-                    var y1 = toScreen(p1).y;
-                    var x2 = toScreen(p2).x;
-                    var y2 = toScreen(p2).y;
+                    var x1 = toScreen(p1.x, p1.y).x;
+                    var y1 = toScreen(p1.x, p1.y).y;
+                    var x2 = toScreen(p2.x, p2.y).x;
+                    var y2 = toScreen(p2.x, p2.y).y;
 
                     var direction = new Vector(x2-x1, y2-y1);
                     var normal = direction.normal().normalise();
@@ -399,8 +421,8 @@ jQuery.fn.springyx3dom = function(params) {
 //                    // Figure out how far off centre the line should be drawn
                       var offset = normal.multiply(-((total - 1) * spacing)/2.0 + (n * spacing)).multiply(0.2);
 //
-                      var s1 = toScreen(p1).add(offset);
-                      var s2 = toScreen(p2).add(offset);
+                      var s1 = toScreen(p1.x, p1.y).add(offset);
+                      var s2 = toScreen(p2.x, p2.y).add(offset);
 //  
 //                    //var boxWidth = edge.target.getWidth();
 //                    //var boxHeight = edge.target.getHeight();
