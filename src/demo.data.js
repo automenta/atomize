@@ -23,8 +23,8 @@ var nameGraph = new AGraph();
     var james = nameGraph.newNode({label: 'James'});
     var bianca = nameGraph.newNode({label: 'Bianca'});
      
-    nameGraph.newEdge(dennis, michael, {color: '#00A0B0'});
-    nameGraph.newEdge(michael, dennis, {color: '#6A4A3C'});
+    nameGraph.newEdge(dennis, michael, {color: '#00A0B0', label: 'childOf'});
+    nameGraph.newEdge(michael, dennis, {color: '#6A4A3C', label: 'fatherOf'});
     nameGraph.newEdge(michael, jessica, {color: '#CC333F'});
     nameGraph.newEdge(jessica, barbara, {color: '#EB6841'});
     nameGraph.newEdge(michael, timothy, {color: '#EDC951'});

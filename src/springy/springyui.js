@@ -30,7 +30,8 @@ jQuery.fn.springy = function( params) {
     if(!graph){
         return;
     }
-    
+
+    var dragPans = params.dragPans;
     var stiffness = params.stiffness || 400.0;
     var repulsion = params.repulsion || 400.0;
     var damping = params.damping || 0.5;
@@ -99,27 +100,27 @@ jQuery.fn.springy = function( params) {
         }
     });
         
-	jQuery(canvas).mousedown(function(e){
+    jQuery(canvas).mousedown(function(e){
 		jQuery('.actions').hide();
 
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = nearest = dragged = layout.nearest(p);
 
-        if (dragged.distance > nearThreshold) {
+        if (dragPans && (dragged.distance > nearThreshold)) {
             dragged = null;
             panning = true;    
         }
         
-		if ((selected.node !== null) && (dragged!=null))
-		{
-			dragged.point.m = 10000.0;
-		}
+        if ((selected.node !== null) && (dragged!=null))
+        {
+                dragged.point.m = 10000.0;
+        }
 
 		renderer.start();
-	});
+    });
 
-	jQuery(canvas).mousemove(function(e){
+    jQuery(canvas).mousemove(function(e){
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		nearest = layout.nearest(p);
@@ -129,22 +130,23 @@ jQuery.fn.springy = function( params) {
 			dragged.point.p.x = p.x;
 			dragged.point.p.y = p.y;
 		}
-        if (panning) {
-            if (lastPoint!=null) {
-                windowOffset.x -= (lastPoint.x - p.x);
-                windowOffset.y -= (lastPoint.y - p.y);
-            }
-            lastPoint = p;  
-        }
+                
+                if ((panning) && (dragPans)) {
+                    if (lastPoint!=null) {
+                        windowOffset.x -= (lastPoint.x - p.x);
+                        windowOffset.y -= (lastPoint.y - p.y);
+                    }
+                    lastPoint = p;  
+                }
         
 		renderer.start();
-	});
+    });
 
-	jQuery(window).bind('mouseup',function(e){
-		dragged = null;
+    jQuery(window).bind('mouseup',function(e){
+	dragged = null;
         panning = false;
         lastPoint = null;
-	});
+    });
 
 	Node.prototype.getWidth = function() {
 		ctx.save();
@@ -213,7 +215,7 @@ jQuery.fn.springy = function( params) {
 			var arrowWidth;
 			var arrowLength;
 
-			var weight = typeof(edge.data.weight) !== 'undefined' ? edge.data.weight : 1.0;
+			var weight = typeof(edge.data.weight) !== 'undefined' ? edge.data.weight : 4.0;
 
 			ctx.lineWidth = Math.max(weight *  2, 0.1);
 			arrowWidth = 1 + ctx.lineWidth;

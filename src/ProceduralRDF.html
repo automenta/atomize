@@ -39,8 +39,7 @@
               .add('<http://example.com/aReallyGreatBook> dct:issued "2004-01-19"^^xsd:date .')
 
             var graph = new AGraph().loadDataBank(rdfdata);
-            var space = new3DSpace('#content', '50%', '50%');
-            var layout = graphLayout('#content', graph);            
+            var space = new3DSpace('content', graph, '50%', '50%');
 
         });
 

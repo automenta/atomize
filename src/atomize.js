@@ -6,7 +6,7 @@ function new3DSpace(element, graph, width, height) {
     var x3delement = element + '_X3D';
     
     var t = '';    
-    t += '<x3d id="' + x3delement + '" style="position:relative; display:block; line-height:0px; padding:0; display:block; width:' + width + '; height:' + height + '; border-color:#666;">';
+    t += '<x3d id="' + x3delement + '" style="position:relative; line-height:0px; padding:0; display:block; width:' + width + '; height:' + height + '; border-color:#666;">';
     t += '<scene>';
     t += '  <param name="PrimitiveQuality" value="Low"></param>';
     t += '  <viewpoint position="0 0 11"></viewpoint>';
@@ -436,12 +436,12 @@ jQuery.fn.springyx3dom = function(params) {
 //                    }
 //
 //
-//                    var stroke = typeof(edge.data.color) !== 'undefined' ? edge.data.color : '#000000';
+                      var stroke = typeof(edge.data.color) !== 'undefined' ? edge.data.color : '#777';
 //
 //                    var arrowWidth;
 //                    var arrowLength;
 //
-//                    var weight = typeof(edge.data.weight) !== 'undefined' ? edge.data.weight : 1.0;
+                     var weight = typeof(edge.data.weight) !== 'undefined' ? edge.data.weight : 1.0;
 //
 //                    ctx.lineWidth = Math.max(weight *  2, 0.1);
 //                    arrowWidth = 1 + ctx.lineWidth;
@@ -481,6 +481,15 @@ jQuery.fn.springyx3dom = function(params) {
                         var s = document.createElement('Shape');
                         t.appendChild(s);
 
+                        {
+                            var a = document.createElement('Appearance');
+                            var m = document.createElement('Material');
+                            m.setAttribute("diffuseColor", stroke);
+
+                            a.appendChild(m);
+                            s.appendChild(a);
+                        }
+                        
                         var b = document.createElement('Cone');
                         s.appendChild(b);
 
